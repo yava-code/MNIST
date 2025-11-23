@@ -70,9 +70,9 @@ model_cnn = MnistCNN()
 
 # Грузим веса (map_location='cpu' важно, если обучал на GPU, а запускаешь на CPU)
 try:
-    model_logistic.load_state_dict(torch.load('mnist-logistic.pth', map_location='cpu'))
-    model_mlp.load_state_dict(torch.load('mnist-mlp.pth', map_location='cpu'))
-    model_cnn.load_state_dict(torch.load('mnist-cnn.pth', map_location='cpu'))
+    model_logistic.load_state_dict(torch.load('models/mnist-logistic.pth', map_location='cpu'))
+    model_mlp.load_state_dict(torch.load('models/mnist-mlp.pth', map_location='cpu'))
+    model_cnn.load_state_dict(torch.load('models/mnist-cnn.pth', map_location='cpu'))
     print("Все модели успешно загружены!")
 except Exception as e:
     print(f"Ошибка загрузки моделей: {e}")
