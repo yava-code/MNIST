@@ -1,10 +1,11 @@
 import torch
 import pytest
-import sys
 import os
+import sys
+from pathlib import Path
 
-# Add parent directory to path to import main
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from main import MnistModel, MnistMLP, MnistCNN
 

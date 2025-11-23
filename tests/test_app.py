@@ -1,13 +1,13 @@
 import pytest
-import sys
-import os
 import json
 import base64
+import sys
 from io import BytesIO
 from PIL import Image
+from pathlib import Path
 
 # Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from main import app
 
