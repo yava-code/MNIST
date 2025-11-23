@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MNIST Arena</title>
+    <style>
+        body { font-family: monospace; background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        h1 { margin-bottom: 20px; }
+        .container { display: flex; gap: 40px; align-items: flex-start; }
+        .canvas-area { text-align: center; }
+        canvas { border: 2px solid #333; background: #000; cursor: crosshair; box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); }
+        .results { background: #1e1e1e; padding: 20px; border-radius: 8px; min-width: 200px; }
+        .model-row { display: flex; justify-content: space-between; margin: 15px 0; font-size: 1.2em; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .val { font-weight: bold; color: #0f0; }
+        button { background: #333; color: white; border: none; padding: 10px 20px; margin-top: 10px; cursor: pointer; font-family: inherit; font-size: 1em; transition: 0.2s; }
+        button:hover { background: #555; }
+        #clearBtn { background: #800; }
+        #clearBtn:hover { background: #a00; }
+    </style>
+</head>
+<body>
+
+<h1>PYTORCH MNIST BATTLE</h1>
+
+<div class="container">
+    <div class="canvas-area">
+        <canvas id="drawCanvas" width="280" height="280"></canvas>
+        <br>
+        <button onclick="predict()">PREDICT</button>
+        <button id="clearBtn" onclick="clearCanvas()">CLEAR</button>
+    </div>
+
+    <div class="results">
+        <div class="model-row"><span>Logistic:</span> <span id="res-log" class="val">-</span></div>
+        <div class="model-row"><span>MLP:</span> <span id="res-mlp" class="val">-</span></div>
+        <div class="model-row"><span>CNN:</span> <span id="res-cnn" class="val">-</span></div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    // Настройки кисти (белая на черном фоне, как в MNIST)
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 15; // Толстая линия, чтобы при сжатии до 28px она не исчезла
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Рисование
+    canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+    canvas.addEventListener('mousemove', (e) => {
+        if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }
+    });
+    canvas.addEventListener('mouseup', () => { drawing = false; });
+    canvas.addEventListener('mouseout', () => { drawing = false; });
+
+    function clearCanvas() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        document.querySelectorAll('.val').forEach(el => el.innerText = '-');
+    }
+
+    // Заливаем черным при старте (иначе прозрачный фон сломает все)
+    clearCanvas();
+
+    async function predict() {
+        const dataURL = canvas.toDataURL('image/png');
+
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: JSON.stringify({ image: dataURL }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+            alert(result.error);
+        } else {
+            document.getElementById('res-log').innerText = result.logistic;
+            document.getElementById('res-mlp').innerText = result.mlp;
+            document.getElementById('res-cnn').innerText = result.cnn;
+        }
+    }
+</script>
+</body>
+</html>
